@@ -475,6 +475,18 @@ export default function App() {
             {/* Navigation Tabs */}
             <nav className="flex bg-[#141414]/5 p-1 rounded-xl border border-[#141414]/10">
               <button
+                onClick={() => setActiveTab('summary')}
+                className={`
+                  flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer
+                  ${activeTab === 'summary' 
+                    ? 'bg-[#2563eb] text-white shadow-lg' 
+                    : 'text-[#2563eb]/70 hover:text-[#2563eb] hover:bg-[#2563eb]/10'}
+                `}
+              >
+                <TableIcon className="w-4 h-4" />
+                시험 분석결과
+              </button>
+              <button
                 onClick={() => setActiveTab('analyze')}
                 className={`
                   flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer
@@ -503,18 +515,7 @@ export default function App() {
                   </span>
                 )}
               </button>
-              <button
-                onClick={() => setActiveTab('summary')}
-                className={`
-                  flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer
-                  ${activeTab === 'summary' 
-                    ? 'bg-[#2563eb] text-white shadow-lg' 
-                    : 'text-[#2563eb]/70 hover:text-[#2563eb] hover:bg-[#2563eb]/10'}
-                `}
-              >
-                <TableIcon className="w-4 h-4" />
-                분석결과
-              </button>
+              
             </nav>
           </div>
         </header>
@@ -1249,7 +1250,7 @@ function AnalysisSummary({ results, accumulatedResults }: AnalysisSummaryProps) 
               }));
               const sorted = [...domainTableData].sort((a, b) => b.count - a.count);
               return (
-                <table className="min-w-[240px] w-auto mx-auto text-center border-collapse text-[#141414] text-base border border-[#2563eb]/40 bg-white rounded-xl shadow">
+                <table className="w-auto mx-auto text-center border-collapse text-[#141414] text-base border border-[#2563eb]/40 bg-white rounded-xl shadow">
                   <thead>
                     <tr>
                       <th className="p-2 border border-[#2563eb]/40 bg-[#afc7fa] font-bold">순위</th>
