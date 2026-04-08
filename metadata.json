@@ -1,5 +1,0 @@
-{
-  "name": "시험성적서 분석기 (Test Report Analyzer)",
-  "description": "PDF 시험성적서를 업로드하여 시험항목, 측정지표 등 주요 정보를 자동으로 추출하고 분석합니다.",
-  "requestFramePermissions": []
-}
