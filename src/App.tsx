@@ -44,6 +44,7 @@ import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'motion/react';
 import * as mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
+import Login from './Login';
 
 // --- Types ---
 
@@ -94,7 +95,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // --- App Component ---
 
 export default function App() {
-
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     // 누적 결과 행 선택 상태 및 선택 삭제 함수
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -456,6 +457,10 @@ export default function App() {
     }
   };
 
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
+
   return (
     <div className="min-h-screen bg-white text-[#141414] font-sans p-6 md:p-12">
       <div className="w-[95vw] mx-auto text-[#1e3a8a]">
@@ -644,8 +649,8 @@ export default function App() {
                               <col /> {/* 보고서 종류 */}
                               <col /> {/* 발급 일자 */}
                               <col /> {/* 시험성적서 날짜 */}
-                              {(Object.keys(FIELD_LABELS) as (keyof AnalysisResult)[])
-                                .filter((key) => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
+                              {(Object.keys(FIELD_LABELS) as (keyof typeof FIELD_LABELS)[])
+                                .filter(key => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
                                 .map((key, idx) => (
                                   <col key={key} />
                                 ))}
@@ -701,8 +706,8 @@ export default function App() {
                                     const found = techMap.filter(t => t.keywords.some(k => text.includes(k.toLowerCase()))).map(t => t.label);
                                     return found.length > 0 ? found.join(', ') : '-';
                                   })()}</td>
-                                  {(Object.keys(FIELD_LABELS) as (keyof AnalysisResult)[])
-                                    .filter((key) => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
+                                  {(Object.keys(FIELD_LABELS) as (keyof typeof FIELD_LABELS)[])
+                                    .filter(key => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
                                     .map((key, colIdx) => (
                                       <td key={key} className="p-4 text-xs leading-relaxed border-r border-[#141414]/10 last:border-r-0 align-top">
                                         <div className="whitespace-pre-wrap">
@@ -846,8 +851,8 @@ export default function App() {
                             <col /> {/* 보고서 종류 */}
                             <col /> {/* 주요 기술 */}
                             <col /> {/* 시험성적서 날짜 */}
-                            {(Object.keys(FIELD_LABELS) as (keyof AnalysisResult)[])
-                              .filter((key) => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
+                            {(Object.keys(FIELD_LABELS) as (keyof typeof FIELD_LABELS)[])
+                              .filter(key => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
                               .map((key, idx) => (
                                 <col key={key} />
                               ))}
@@ -936,8 +941,8 @@ export default function App() {
                                     return found.length > 0 ? found.join(', ') : '-';
                                   })()}
                                 </td>
-                                {(Object.keys(FIELD_LABELS) as (keyof AnalysisResult)[])
-                                  .filter((key) => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
+                                {(Object.keys(FIELD_LABELS) as (keyof typeof FIELD_LABELS)[])
+                                  .filter(key => !['created_at','Metrics','EQ','companyName','gubun_code','Report_No'].includes(key))
                                   .map((key, colIdx) => (
                                     <td key={key} className="p-4 text-xs leading-relaxed border-r border-[#141414]/10 last:border-r-0 align-top">
                                       <div className="whitespace-pre-wrap">
