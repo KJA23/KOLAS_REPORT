@@ -1,23 +1,42 @@
 import React, { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 interface LoginProps {
   onLogin: () => void;
 }
 
+
+const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
+const supabaseKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 간단한 예시: 아이디/비번이 비어있지 않으면 로그인 성공
-    if (username && password) {
-      setError('');
-      onLogin();
-    } else {
+    if (!username || !password) {
       setError('아이디와 비밀번호를 입력하세요.');
+      return;
     }
+    setLoading(true);
+    setError('');
+    // Member 테이블에서 Id, Password 확인
+    const { data, error: supaError } = await supabase
+      .from('Member')
+      .select('*')
+      .eq('Id', username)
+      .eq('Password', password)
+      .single();
+    setLoading(false);
+    if (supaError || !data) {
+      setError('아이디 또는 비밀번호가 올바르지 않습니다.');
+      return;
+    }
+    onLogin();
   };
 
   return (
@@ -83,12 +102,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             border: 'none',
             borderRadius: 6,
             fontSize: 16,
-            cursor: 'pointer',
+            cursor: loading ? 'not-allowed' : 'pointer',
             fontWeight: 'bold',
-            boxShadow: '0 2px 4px rgba(25, 118, 210, 0.08)'
+            boxShadow: '0 2px 4px rgba(25, 118, 210, 0.08)',
+            opacity: loading ? 0.7 : 1
           }}
+          disabled={loading}
         >
-          로그인
+          {loading ? '확인 중...' : '로그인'}
         </button>
         {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
       </form>
