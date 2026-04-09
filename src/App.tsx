@@ -95,7 +95,30 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // --- App Component ---
 
 export default function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 로그인 ID 상태는 isLoggedIn과 별도 관리
+  const [loginId, setLoginId] = useState<string | null>(() => localStorage.getItem('login_id'));
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    // 세션 만료 체크
+    const expire = localStorage.getItem('session_expire');
+    if (expire && Date.now() < Number(expire)) {
+      return true;
+    }
+    localStorage.removeItem('session_expire');
+    return false;
+  });
+    // 세션 만료 타이머
+    React.useEffect(() => {
+      if (!isLoggedIn) return;
+      const interval = setInterval(() => {
+        const expire = localStorage.getItem('session_expire');
+        if (!expire || Date.now() > Number(expire)) {
+          localStorage.removeItem('session_expire');
+          setIsLoggedIn(false);
+          alert('세션이 만료되어 자동 로그아웃되었습니다.');
+        }
+      }, 10000); // 10초마다 체크
+      return () => clearInterval(interval);
+    }, [isLoggedIn]);
 
     // 누적 결과 행 선택 상태 및 선택 삭제 함수
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -457,12 +480,50 @@ export default function App() {
     }
   };
 
+
+  // 로그아웃 함수
+  const handleLogout = () => {
+    localStorage.removeItem('session_expire');
+    localStorage.removeItem('login_id');
+    setIsLoggedIn(false);
+    setLoginId(null);
+  };
+
   if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
+    return <Login onLogin={(id?: string) => {
+      // 로그인 성공 시 세션 만료 시간 갱신
+      const expire = Date.now() + 60 * 60 * 1000;
+      localStorage.setItem('session_expire', expire.toString());
+      if (id) {
+        localStorage.setItem('login_id', id);
+        setLoginId(id);
+      } else {
+        // 기존 방식: login_id가 없는 경우에도 localStorage에서 가져옴
+        const storedId = localStorage.getItem('login_id');
+        setLoginId(storedId);
+      }
+      setIsLoggedIn(true);
+    }} />;
   }
+
 
   return (
     <div className="min-h-screen bg-white text-[#141414] font-sans p-6 md:p-12">
+      {/* 최상단 왼쪽: 로그아웃 + 로그인 ID */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded-lg bg-blue-500 text-white font-bold text-sm hover:bg-blue-600 transition-all border border-blue-600 shadow"
+        >
+          로그아웃
+        </button>
+        {loginId && (
+          <span className="text-[#2563eb] font-bold text-base bg-white/80 px-3 py-1 rounded border border-[#2563eb]/30 shadow">
+            {loginId} 님
+          </span>
+        )}
+      </div>
+
       <div className="w-[95vw] mx-auto text-[#1e3a8a]">
         {/* Header */}
         <header className="mb-8 border-b border-[#141414] pb-6">
@@ -520,7 +581,6 @@ export default function App() {
                   </span>
                 )}
               </button>
-              
             </nav>
           </div>
         </header>
