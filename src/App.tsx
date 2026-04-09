@@ -84,7 +84,7 @@ const FIELD_LABELS: Record<keyof Omit<AnalysisResult, 'id'>, string> = {
   EQ: "산식(미노출)"
 };
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://kolas-report.onrender.com';
 
 // Supabase 클라이언트 생성
 const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
@@ -1299,7 +1299,7 @@ function AnalysisSummary({ results, accumulatedResults }: AnalysisSummaryProps) 
               }));
               const sorted = [...fieldTableData].sort((a, b) => b.count - a.count);
               return (
-                <table className="min-w-[240px] w-auto mx-auto text-center border-collapse text-[#141414] text-base border border-[#2563eb]/40 bg-white rounded-xl shadow">
+                <table className="w-auto mx-auto text-center border-collapse text-[#141414] text-base border border-[#2563eb]/40 bg-white rounded-xl shadow">
                   <thead>
                     <tr>
                       <th className="p-2 border border-[#2563eb]/40 bg-[#afc7fa] font-bold">순위</th>
